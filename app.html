@@ -1,0 +1,934 @@
+<title>Ballarat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<style>
+:root{
+  --bg:#16141f; --surface:#1e1b2b; --raise:#2a2640; --line:#353050;
+  --fg:#f1effa; --muted:#a49fbf; --accent:#43ad8f; --accent-ink:#ffffff; --accent-2:#c4f04a;
+  --danger:#ff7a7a; --warn:#f2b84b;
+  --display:"Roboto",ui-sans-serif,system-ui,sans-serif;
+  --body:"Roboto",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--body);margin:0}
+*,*::before,*::after{font-variant-numeric:tabular-nums!important;font-feature-settings:"tnum" 1}
+.wrap{max-width:1100px;margin:0 auto;padding:16px 16px 120px}
+h1,h2{font-family:var(--display)}
+h2{font-size:17px;font-weight:700;margin:0;letter-spacing:-.01em}
+h3{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:500;margin:22px 0 8px}
+.muted{color:var(--muted)}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header{margin-bottom:14px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.lockup{--mk:40px;display:flex;align-items:center;gap:6px;margin:0;min-width:0}
+.mark{width:var(--mk);height:var(--mk);flex:none;display:block}
+.wm{font-weight:700;font-size:26px;letter-spacing:-.01em;line-height:1.1}
+.acts{display:flex;gap:8px;flex:none}
+.btn{border:1px solid var(--line);background:var(--raise);color:var(--fg);border-radius:8px;padding:7px 12px;font-weight:500;font-size:13px;min-height:36px}
+.btn:hover{border-color:var(--muted)}
+.btn-primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn-primary:hover{filter:brightness(1.08);border-color:var(--accent)}
+.btn.danger{color:var(--danger)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.icon{min-width:40px;font-size:18px;line-height:1;padding:4px 10px}
+.status{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-top:6px;min-width:0}
+.status span{min-width:0;overflow-wrap:anywhere}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.status[data-state="live"] .dot{background:var(--accent)}
+.status[data-state="error"] .dot{background:var(--danger)}
+.status[data-state="loading"] .dot{background:var(--accent);animation:pulse 1s infinite alternate}
+@keyframes pulse{to{opacity:.3}}
+.notice{display:flex;gap:10px;align-items:flex-start;background:var(--raise);border:1px solid var(--line);border-left:3px solid var(--accent);padding:10px 12px;border-radius:8px;margin-bottom:14px;font-size:14px}
+.notice[hidden]{display:none}
+.notice[data-kind="error"]{border-left-color:var(--danger)}
+.notice .nt{flex:1;min-width:0;overflow-wrap:anywhere}
+.notice .nx{flex:none;background:none;border:0;color:var(--muted);font-size:18px;line-height:1;min-width:32px;min-height:32px}
+
+.dates{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.dchip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-size:13px;min-height:36px;text-align:left;overflow-wrap:anywhere;max-width:100%}
+.dchip:hover{border-color:var(--accent)}
+.dchip b{font-weight:500}
+.dchip .cd{color:var(--accent-2);font-weight:500}
+.dchip.add{border-style:dashed;color:var(--muted)}
+
+.seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:14px}
+.seg button{background:none;border:0;border-radius:9px;padding:8px 2px;min-height:40px;font-size:13px;font-weight:500;color:var(--muted);line-height:1.2;overflow-wrap:anywhere}
+.seg button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.bar[hidden]{display:none}
+input,textarea,select{font:inherit;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:38px;color-scheme:dark;max-width:100%}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);outline:none}
+.bar input[type=search]{flex:1 1 200px;min-width:0}
+.pseg{display:flex;gap:4px;flex-wrap:wrap}
+.pseg button,.opts button{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:6px 12px;min-height:36px;font-size:13px;font-weight:500}
+.pseg button[aria-pressed="true"],.opts button[aria-pressed="true"]{background:color-mix(in srgb,var(--accent) 22%,transparent);border-color:var(--accent);color:var(--fg)}
+.hint{font-size:13px;color:var(--warn);margin:0 0 12px}
+.hint[hidden]{display:none}
+
+.cards{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:start}
+@media (min-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px 12px;min-width:0}
+.ghost{opacity:.4}
+.chead{display:grid;grid-template-columns:32px minmax(0,1fr) 40px;column-gap:4px;align-items:center}
+.lgrip,.igrip{display:grid;place-items:center;color:var(--muted);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;font-size:18px;min-height:36px}
+.cname{background:none;border:0;text-align:left;padding:4px 0;min-height:36px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;min-width:0}
+.cname .nm{overflow-wrap:anywhere;min-width:0}
+.chev{width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);flex:none;transition:transform .15s;margin-top:-3px}
+.cname[aria-expanded="false"] .chev{transform:rotate(-45deg);margin-top:0}
+.lmenu{background:none;border:0;font-size:20px;min-width:40px;min-height:36px;border-radius:8px;color:var(--muted)}
+.lmenu:hover{background:var(--raise);color:var(--fg)}
+.cmeta{grid-column:2;font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.cmeta .cost{color:var(--fg)}
+.pbar{height:5px;background:var(--raise);border-radius:3px;overflow:hidden;margin:8px 0 4px}
+.pbar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:3px}
+.items{list-style:none;margin:0;padding:0;min-height:20px}
+.items:empty::before{content:"Nothing here yet. Add something below, or drag an item in.";display:block;color:var(--muted);font-size:13px;padding:8px 4px}
+.irow{display:flex;align-items:flex-start;gap:0;border-top:1px solid var(--line);min-width:0}
+.irow:first-child{border-top:0}
+.igrip{flex:none;width:28px;min-height:44px}
+.nodrag .igrip,.nodrag .lgrip,.ro .igrip{opacity:.25;cursor:default}
+.sbox{flex:none;width:40px;height:44px;display:grid;place-items:center;background:none;border:0;padding:0}
+.bx{width:22px;height:22px;border:2px solid var(--muted);border-radius:6px;display:grid;place-items:center;transition:background .12s,border-color .12s}
+.bx svg{width:14px;height:14px;display:block}
+.bx.st{border-color:var(--warn);color:var(--warn)}
+.bx.dn{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.sbox:hover .bx{border-color:var(--fg)}
+.ibody{flex:1;min-width:0;background:none;border:0;text-align:left;padding:9px 6px 9px 4px;min-height:44px;display:block;font:inherit}
+.ro .ibody{cursor:default}
+.it{display:block;font-weight:500;line-height:1.35;overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:3px}
+.chips:empty{display:none}
+.chip,.pill{font-size:11px;padding:1px 8px;border-radius:999px;background:var(--raise);color:var(--muted);line-height:1.6;overflow-wrap:anywhere;max-width:100%}
+.chip.lc{color:var(--fg);background:color-mix(in srgb,var(--accent) 16%,var(--raise))}
+.pill.p-High{background:color-mix(in srgb,var(--danger) 20%,transparent);color:var(--danger)}
+.pill.p-Medium{background:color-mix(in srgb,var(--warn) 20%,transparent);color:var(--warn)}
+.pill.p-Low{background:var(--raise);color:var(--muted)}
+.chip.due.od{color:var(--danger);background:color-mix(in srgb,var(--danger) 16%,transparent)}
+.snote{display:block;font-size:13px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere;white-space:pre-wrap}
+.lnk{flex:none;width:40px;height:44px;display:grid;place-items:center;color:var(--accent);text-decoration:none;font-size:18px;border-radius:8px}
+.lnk:hover{background:var(--raise)}
+.irow.done .it{text-decoration:line-through}
+.irow.done .ibody,.irow.done .igrip{opacity:.55}
+.addrow{margin-top:6px;display:flex}
+.addrow input{flex:1;min-width:0;border-style:dashed}
+.btn-add{display:block;width:100%;margin-top:14px;border-style:dashed;color:var(--muted);padding:10px}
+.nsec .irow{background:var(--surface);}
+.nlist{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:2px 12px;list-style:none;margin:0}
+.nlist .irow{padding-left:0}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:22px 16px;text-align:center;color:var(--muted)}
+.arch-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.arch-card{margin-bottom:12px}
+.arch-card .chead{grid-template-columns:minmax(0,1fr) auto}
+.arch-card .cmeta{grid-column:1}
+
+.menu{position:fixed;z-index:60;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px;min-width:190px;max-width:calc(100vw - 16px);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.menu[hidden]{display:none}
+.menu button{display:block;width:100%;text-align:left;background:none;border:0;border-radius:8px;padding:9px 12px;min-height:40px;font-size:14px}
+.menu button:hover,.menu button:focus-visible{background:var(--raise)}
+.menu button.danger{color:var(--danger)}
+
+.toast{position:fixed;left:16px;right:16px;bottom:16px;z-index:70;max-width:420px;margin:0 auto;background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:8px 8px 8px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.toast[hidden]{display:none}
+.toast span{flex:1;min-width:0;font-size:14px}
+
+dialog{background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:16px;padding:0;width:min(560px,calc(100% - 32px));max-height:calc(100dvh - 32px);overflow:hidden}
+dialog[open]{display:flex;flex-direction:column}
+dialog::backdrop{background:rgba(8,6,14,.65)}
+dialog form{display:flex;flex-direction:column;min-height:0;flex:1}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.dlg-body{padding:14px 16px;display:grid;gap:14px;overflow-y:auto;min-height:0;overflow-wrap:anywhere}
+.dlg-foot{display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--line)}
+.dlg-foot .sp{flex:1}
+.field{display:grid;gap:5px;min-width:0}
+.field label,.field .lbl{font-size:13px;color:var(--muted)}
+.field textarea{min-height:90px;resize:vertical}
+.field input,.field select,.field textarea{width:100%}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opts.big button{display:flex;align-items:center;gap:8px;flex:1 1 90px;justify-content:center;border-radius:12px;padding:8px 6px;min-height:44px}
+.row2{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row2 input{flex:1 1 150px}
+.msg{font-size:13px;color:var(--danger);min-height:1em;margin:0}
+.help p,.help li{font-size:14px;color:var(--muted);margin:0 0 8px}
+.help ul{padding-left:18px;margin:0 0 8px}
+.help b{color:var(--fg)}
+.help .hb{display:flex;align-items:center;gap:10px;margin:6px 0}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="top">
+      <h1 class="lockup" aria-label="Ballarat"><svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="#43ad8f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 50 L50 18 L86 50"/><path d="M24 44 V82 H76 V44"/><path d="M38 60 L47 69 L63 50"/></g></svg><span class="wm" aria-hidden="true">Ballarat</span></h1>
+      <div class="acts">
+        <button class="btn" id="refreshBtn" type="button">Refresh</button>
+        <button class="btn icon" id="menuBtn" type="button" aria-label="More options" aria-haspopup="true">⋯</button>
+      </div>
+    </div>
+    <div class="status" id="status" data-state="loading"><span class="dot"></span><span id="statusText">Connecting…</span></div>
+  </header>
+  <div class="notice" id="notice" hidden role="status"><span class="nt" id="noticeText"></span><button class="nx" id="noticeX" type="button" aria-label="Dismiss">×</button></div>
+  <section class="dates" id="dates" aria-label="Key dates"></section>
+  <nav class="seg" id="seg" role="tablist" aria-label="Sections">
+    <button type="button" role="tab" data-tab="next">Next up</button>
+    <button type="button" role="tab" data-tab="Prep">Move prep</button>
+    <button type="button" role="tab" data-tab="Settle">Settle in</button>
+    <button type="button" role="tab" data-tab="Ballarat">Ballarat</button>
+  </nav>
+  <div class="bar" id="bar" hidden>
+    <input id="q" type="search" placeholder="Search titles and notes" aria-label="Search items" autocomplete="off">
+    <div class="pseg" id="pseg" role="group" aria-label="Filter by priority">
+      <button type="button" data-p="" aria-pressed="true">All</button><button type="button" data-p="High" aria-pressed="false">High</button><button type="button" data-p="Medium" aria-pressed="false">Medium</button><button type="button" data-p="Low" aria-pressed="false">Low</button>
+    </div>
+  </div>
+  <p class="hint" id="hint" hidden>Search or filter is on, so dragging is switched off. Clear it to reorder.</p>
+  <main id="main"></main>
+</div>
+
+<div class="menu" id="menu" role="menu" hidden></div>
+<div class="toast" id="toast" role="status" hidden><span id="toastText"></span><button class="btn" id="toastBtn" type="button"></button></div>
+
+<dialog id="iDlg" aria-labelledby="iHead">
+  <form id="iForm" novalidate>
+    <div class="dlg-head"><h2 id="iHead">Item</h2><button class="btn" type="button" id="iClose">Close</button></div>
+    <div class="dlg-body">
+      <div class="field"><label for="iTitle">Title</label><input id="iTitle" autocomplete="off"></div>
+      <div class="field"><span class="lbl" id="stLbl">Status</span>
+        <div class="opts big" id="iStatus" role="group" aria-labelledby="stLbl">
+          <button type="button" data-v="Not started" aria-pressed="false"><span class="bx"></span>Not started</button>
+          <button type="button" data-v="Stalled" aria-pressed="false"><span class="bx st"><svg viewBox="0 0 14 14"><path d="M3 7h8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>Stalled</button>
+          <button type="button" data-v="Done" aria-pressed="false"><span class="bx dn"><svg viewBox="0 0 14 14"><path d="M3 7.4l2.6 2.6L11 4.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Done</button>
+        </div></div>
+      <div class="field"><span class="lbl" id="prLbl">Priority</span>
+        <div class="opts" id="iPri" role="group" aria-labelledby="prLbl">
+          <button type="button" data-v="" aria-pressed="false">None</button><button type="button" data-v="Low" aria-pressed="false">Low</button><button type="button" data-v="Medium" aria-pressed="false">Medium</button><button type="button" data-v="High" aria-pressed="false">High</button>
+        </div></div>
+      <div class="field"><label for="iDue">Due</label><div class="row2"><input id="iDue" type="date"><button class="btn" type="button" id="iDueClear">Clear</button></div></div>
+      <div class="field"><label for="iNotes">Notes / reasons for delays</label><textarea id="iNotes"></textarea></div>
+      <div class="field"><label for="iLink">Link</label><input id="iLink" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://"></div>
+      <div class="field"><label for="iCost">Cost (AUD)</label><input id="iCost" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+      <div class="field"><label for="iList">Move to list</label><select id="iList"></select></div>
+      <p class="msg" id="iMsg" role="alert"></p>
+    </div>
+    <div class="dlg-foot"><button class="btn danger" type="button" id="iDel">Delete</button><span class="sp"></span><button class="btn" type="button" id="iCancel">Cancel</button><button class="btn btn-primary" type="submit" id="iSave">Save</button></div>
+  </form>
+</dialog>
+
+<dialog id="mDlg" aria-labelledby="mTitle" style="width:min(460px,calc(100% - 32px))">
+  <div class="dlg-head"><h2 id="mTitle"></h2></div>
+  <div class="dlg-body"><div id="mBody"></div><p class="msg" id="mErr" role="alert"></p></div>
+  <div class="dlg-foot" id="mFoot"></div>
+</dialog>
+
+<dialog id="sDlg" aria-labelledby="sTitle" style="width:min(520px,calc(100% - 32px))">
+  <form id="sForm" novalidate>
+    <div class="dlg-head"><h2 id="sTitle">Your Ballarat sheet</h2><button class="btn" type="button" id="sClose">Close</button></div>
+    <div class="dlg-body">
+      <p class="muted" style="margin:0;font-size:14px">Paste the link to your Ballarat Google Sheet. It's saved in this browser only.</p>
+      <div class="field"><label for="sLink">Sheet link</label><input id="sLink" autocomplete="off" spellcheck="false" placeholder="https://docs.google.com/spreadsheets/d/…"></div>
+      <p class="msg" id="sMsg" role="alert"></p>
+    </div>
+    <div class="dlg-foot"><button class="btn btn-primary" type="submit">Save link</button></div>
+  </form>
+</dialog>
+
+<dialog id="gDlg" aria-labelledby="gTitle" style="width:min(520px,calc(100% - 32px))">
+  <form id="gForm" novalidate>
+    <div class="dlg-head"><h2 id="gTitle">Connect your Google Sheet</h2><button class="btn" type="button" id="gClose">Close</button></div>
+    <div class="dlg-body">
+      <p class="muted" style="margin:0;font-size:14px">Paste the OAuth Client ID from your Google Cloud project (the same one the book app uses). It's saved in this browser only.</p>
+      <div class="field"><label for="gClient">OAuth Client ID</label><input id="gClient" autocomplete="off" spellcheck="false" placeholder="1234…apps.googleusercontent.com"></div>
+      <p class="msg" id="gMsg" role="alert"></p>
+    </div>
+    <div class="dlg-foot"><button class="btn btn-primary" type="submit">Connect</button></div>
+  </form>
+</dialog>
+
+<dialog id="hDlg" aria-labelledby="hTitle">
+  <div class="dlg-head"><h2 id="hTitle">How this works</h2><button class="btn" type="button" id="hClose">Close</button></div>
+  <div class="dlg-body help">
+    <div>
+      <p>Every item has a little box. Tap it to move through the three states:</p>
+      <div class="hb"><span class="bx"></span><span><b>Not started</b>: still to do.</span></div>
+      <div class="hb"><span class="bx st"><svg viewBox="0 0 14 14"><path d="M3 7h8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span><b>Stalled</b>: stuck or waiting. Add the reason in the notes.</span></div>
+      <div class="hb"><span class="bx dn"><svg viewBox="0 0 14 14"><path d="M3 7.4l2.6 2.6L11 4.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>Done</b>: finished.</span></div>
+    </div>
+    <ul>
+      <li><b>Next up</b> pulls together what's overdue, due in the next 14 days, high priority with no date, and stalled.</li>
+      <li>Drag the ⠿ grip to reorder. You can also use Move up / Move down in a list's menu, or Move to list inside an item.</li>
+      <li>Tap an item's title to add a due date, notes, a link or a cost.</li>
+      <li>Done lists can be archived from their ⋯ menu, and found again under Archive.</li>
+    </ul>
+  </div>
+</dialog>
+
+<script>
+const SERVER = 'Google Sheets';
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* ---------- storage: every read and write is wrapped ---------- */
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  json(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+};
+const TAB_NAME = { Prep: 'Move prep', Settle: 'Settle in', Ballarat: 'Ballarat' };
+const TAB_KEYS = ['next', 'Prep', 'Settle', 'Ballarat'];
+let SHEET_ID = (store.json('bm_config', {}) || {}).sheetId || '';
+
+const state = {
+  lists: [], items: [], dates: [], live: false, mcp: null, google: false, loaded: false,
+  tab: TAB_KEYS.includes(store.get('bm_tab')) ? store.get('bm_tab') : 'next',
+  view: 'main', q: '', pri: '', pending: 0, hideDone: store.get('bm_hidedone') === '1',
+  collapsed: store.json('bm_collapsed', {})
+};
+
+/* ---------- dates ---------- */
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const pad = n => String(n).padStart(2, '0');
+const mkIso = (y, m, d) => (m >= 1 && m <= 12 && d >= 1 && d <= 31 && y > 1900 && y < 2200) ? `${y}-${pad(m)}-${pad(d)}` : '';
+const todayIso = () => { const d = new Date(); return mkIso(d.getFullYear(), d.getMonth() + 1, d.getDate()); };
+function parseDate(v) {
+  if (v == null) return '';
+  const s = String(v).trim(); if (!s) return '';
+  if (/^\d{5}(\.\d+)?$/.test(s)) {
+    const n = Math.floor(+s); if (n < 20000 || n > 80000) return '';
+    const d = new Date(Date.UTC(1899, 11, 30) + n * 864e5);
+    return mkIso(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());
+  }
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return mkIso(+m[1], +m[2], +m[3]);
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (m) { let y = +m[3]; if (y < 100) y += 2000; return mkIso(y, +m[2], +m[1]); }
+  return '';
+}
+const fmtDate = iso => { const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/); return m ? `${+m[3]} ${MON[+m[2] - 1]} ${m[1].slice(2)}` : ''; };
+const utc = iso => { const [y, m, d] = iso.split('-').map(Number); return Date.UTC(y, m - 1, d); };
+const dayDiff = (a, b) => Math.round((utc(b) - utc(a)) / 864e5);
+const addDays = (iso, n) => { const d = new Date(utc(iso) + n * 864e5); return mkIso(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()); };
+function toNum(v) {
+  if (v == null || v === '') return null;
+  if (typeof v === 'number') return isFinite(v) ? v : null;
+  const n = Number(String(v).replace(/[$,\s]/g, '')); return String(v).trim() === '' || !isFinite(n) ? null : n;
+}
+const money = n => '$' + new Intl.NumberFormat('en-AU', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 }).format(n);
+function safeUrl(u) {
+  u = String(u || '').trim(); if (!u) return '';
+  if (!/^[a-z][a-z0-9+.-]*:/i.test(u)) u = 'https://' + u;
+  return /^https?:\/\//i.test(u) ? u : '';
+}
+
+/* ---------- models ---------- */
+const S = x => String(x == null ? '' : x).trim();
+function rowsToObjs(vals, tab) {
+  const h = (vals[0] || []).map(x => S(x)), ii = h.indexOf('id');
+  if (ii < 0) throw new Error(`The ${tab} tab has no "id" column`);
+  const out = [];
+  for (let i = 1; i < vals.length; i++) {
+    const r = vals[i] || []; if (S(r[ii]) === '') continue;
+    const o = {}; h.forEach((k, j) => { if (k) o[k] = r[j] == null ? '' : r[j]; });
+    out.push(o);
+  }
+  return out;
+}
+const normStatus = v => /^done$/i.test(S(v)) ? 'Done' : /^stalled$/i.test(S(v)) ? 'Stalled' : 'Not started';
+const normPri = v => { const s = S(v).toLowerCase(); return s === 'high' ? 'High' : s === 'medium' ? 'Medium' : s === 'low' ? 'Low' : ''; };
+const toList = o => ({ id: +o.id, tab: S(o.tab), name: S(o.name), order: toNum(o.order) ?? 0, archived: /^true$/i.test(S(o.archived)), notes: String(o.notes ?? '') });
+const toItem = o => ({ id: +o.id, listId: +o.listId, order: toNum(o.order) ?? 0, title: String(o.title ?? ''), status: normStatus(o.status), priority: normPri(o.priority),
+  due: parseDate(o.due), notes: String(o.notes ?? ''), link: S(o.link), cost: toNum(o.cost), added: parseDate(o.added), doneOn: parseDate(o.doneOn) });
+const toDateRec = o => ({ id: +o.id, label: S(o.label), date: parseDate(o.date), notes: String(o.notes ?? '') });
+const byOrder = (a, b) => a.order - b.order || a.id - b.id;
+const listById = id => state.lists.find(l => l.id === id);
+const itemById = id => state.items.find(i => i.id === id);
+const listsOf = (tab, arch) => state.lists.filter(l => l.tab === tab && l.archived === !!arch).sort(byOrder);
+const itemsOf = id => state.items.filter(i => i.listId === id).sort(byOrder);
+
+/* ---------- Google Sheets direct (GitHub Pages and other hosts outside claude.ai) ---------- */
+const google_ = {
+  cfgKey: 'mbl_config', tokKey: 'bm-google-token', client: null,
+  cfg() { try { return JSON.parse(localStorage.getItem(this.cfgKey) || 'null') || {}; } catch (e) { return {}; } },
+  saveCfg(c) { try { localStorage.setItem(this.cfgKey, JSON.stringify({ ...this.cfg(), ...c })); } catch (e) {} },
+  tok() { try { return JSON.parse(localStorage.getItem(this.tokKey) || 'null'); } catch (e) { return null; } },
+  valid() { const t = this.tok(); return !!(t && t.exp > Date.now()); },
+  async callTool(server, tool, input) {
+    if (!this.valid()) { googleSignedOut(); throw { code: 'google_signin' }; }
+    const base = `https://sheets.googleapis.com/v4/spreadsheets/${input.spreadsheetId}/values/${encodeURIComponent(input.range)}`;
+    const url = tool === 'get_values' ? base
+      : tool === 'append_values' ? base + ':append?valueInputOption=USER_ENTERED'
+      : base + '?valueInputOption=USER_ENTERED';
+    const opts = { method: tool === 'get_values' ? 'GET' : tool === 'append_values' ? 'POST' : 'PUT', headers: { Authorization: 'Bearer ' + this.tok().t } };
+    if (tool !== 'get_values') { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify({ values: input.values }); }
+    const res = await fetch(url, opts);
+    if (res.status === 401) { try { localStorage.removeItem(this.tokKey); } catch (e) {} googleSignedOut(); throw { code: 'google_signin' }; }
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw { code: 'tool_error', message: (body.error && body.error.message) || 'HTTP ' + res.status };
+    return { payload: body };
+  }
+};
+function googleSignedOut() {
+  state.live = false;
+  setStatus('error', hasData() ? 'Offline · showing last loaded' : 'Not connected');
+  $('refreshBtn').textContent = 'Connect';
+}
+function loadGis() {
+  return new Promise((ok, fail) => {
+    if (window.google && google.accounts && google.accounts.oauth2) return ok();
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client'; s.async = true;
+    s.onload = () => ok(); s.onerror = () => fail(new Error('Google sign-in didn\'t load'));
+    document.head.appendChild(s);
+  });
+}
+function googleConnect() {
+  const id = google_.cfg().clientId;
+  if (!id) { $('gClient').value = ''; $('gMsg').textContent = ''; $('gDlg').showModal(); return; }
+  if (!(window.google && google.accounts && google.accounts.oauth2)) { loadGis().then(googleConnect, err => notice(err.message, 'error')); return; }
+  try {
+    if (!google_.client) google_.client = google.accounts.oauth2.initTokenClient({
+      client_id: id, scope: 'https://www.googleapis.com/auth/spreadsheets',
+      callback: r => {
+        if (r.error) { notice('Google sign-in failed: ' + r.error, 'error'); return; }
+        try { localStorage.setItem(google_.tokKey, JSON.stringify({ t: r.access_token, exp: Date.now() + (r.expires_in - 120) * 1000 })); } catch (e) {}
+        $('refreshBtn').textContent = 'Refresh';
+        refresh();
+      },
+      error_callback: e => notice('Google sign-in was closed or blocked' + (e && e.type ? ' (' + e.type + ')' : '') + '. Press Connect to try again.', 'error')
+    });
+    google_.client.requestAccessToken({ prompt: '' });
+  } catch (err) { notice(err.message, 'error'); }
+}
+function googleBoot() {
+  state.google = true; state.mcp = google_;
+  loadGis().catch(() => {});
+  if (!SHEET_ID) return;
+  if (google_.valid()) { refresh(); return; }
+  googleSignedOut();
+  notice(google_.cfg().clientId ? 'Press Connect to sign in to Google and load your sheet.' : 'Press Connect to link your Google Sheet. You\'ll need the OAuth Client ID from your Google Cloud project.');
+}
+$('gClose').addEventListener('click', () => $('gDlg').close());
+$('gForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const v = $('gClient').value.trim();
+  if (!/\.apps\.googleusercontent\.com$/.test(v)) { $('gMsg').textContent = 'That doesn\'t look like a Client ID.'; return; }
+  google_.saveCfg({ clientId: v }); google_.client = null;
+  $('gDlg').close();
+  googleConnect();
+});
+
+/* ---------- status, notices, toast ---------- */
+function setStatus(kind, text) { $('status').dataset.state = kind; $('statusText').textContent = text; }
+function notice(text, kind) {
+  const n = $('notice'); if (!text) { n.hidden = true; return; }
+  $('noticeText').textContent = text; n.dataset.kind = kind || ''; n.hidden = false;
+}
+$('noticeX').addEventListener('click', () => notice(''));
+let toastTimer = 0;
+function toast(text, btnLabel, fn) {
+  $('toastText').textContent = text; const b = $('toastBtn'); b.hidden = !btnLabel; b.textContent = btnLabel || '';
+  b.onclick = () => { $('toast').hidden = true; if (fn) fn(); };
+  $('toast').hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { $('toast').hidden = true; }, 7000);
+}
+function errText(err) {
+  switch (err && err.code) {
+    case 'google_signin': return 'Your Google sign-in has expired. Press Connect to sign in again.';
+    case 'needs_reauth': return 'Your Google Sheets connection has expired. Reconnect it in claude.ai Settings → Connectors, then press Refresh.';
+    case 'selection_required': return 'You have more than one Google Sheets connector. Choose one when Claude asks, then press Refresh.';
+    case 'not_in_manifest': case 'consent_required': return 'This page isn\'t allowed to use Google Sheets yet. Allow it from the page\'s permissions, then press Refresh.';
+    case 'blocked_by_policy': return 'Your organisation blocks Google Sheets for this page.';
+    case 'server_unavailable': return 'Google Sheets didn\'t answer in time. Press Refresh to try again.';
+    case 'tool_error': return 'Google Sheets reported a problem: ' + (err.message || 'unknown error') + '.';
+    default: return (err && err.message) ? err.message : 'Something went wrong talking to your sheet. Press Refresh to try again.';
+  }
+}
+const hasData = () => state.lists.length || state.items.length || state.dates.length;
+function updateStatus() {
+  if (state.pending > 0) setStatus('loading', 'Saving…');
+  else if (state.live) setStatus('live', 'Live');
+}
+
+/* ---------- cache ---------- */
+function saveCache() { store.set('bm_cache', JSON.stringify({ sheetId: SHEET_ID, lists: state.lists, items: state.items.filter(i => i.id > 0), dates: state.dates.filter(d => d.id > 0) })); }
+function loadCache() {
+  const c = store.json('bm_cache', null);
+  if (c && c.sheetId === SHEET_ID && Array.isArray(c.lists)) { state.lists = c.lists; state.items = c.items || []; state.dates = c.dates || []; state.loaded = true; }
+}
+
+/* ---------- sheet access: scoped reads, find-then-write, explicit ranges ---------- */
+const MAXROW = { Lists: 1000, Items: 5000, Dates: 300 };
+const colLetter = i => { let s = ''; i++; while (i > 0) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
+async function call(tool, input) {
+  const res = await state.mcp.callTool(SERVER, tool, { spreadsheetId: SHEET_ID, ...input }, { cache: false });
+  return res && res.payload;
+}
+async function readRange(range) { const p = await call('get_values', { range }); return p && Array.isArray(p.values) ? p.values : []; }
+
+const NUM_F = new Set(['id', 'listId', 'order', 'cost']), DATE_F = new Set(['due', 'added', 'doneOn', 'date']);
+function fmtVal(k, v) {
+  if (k === 'archived') return v ? 'TRUE' : 'FALSE';
+  if (v == null || v === '') return '';
+  if (NUM_F.has(k)) return Number(v);
+  if (DATE_F.has(k)) return String(v);
+  return "'" + String(v);
+}
+async function readHeader(tab) {
+  const hv = await readRange(`${tab}!A1:Z1`);
+  const header = (hv[0] || []).map(x => S(x)), ic = header.indexOf('id');
+  if (ic < 0) throw new Error(`The ${tab} tab has no "id" column, so I haven't changed anything.`);
+  return { header, ic };
+}
+async function readIds(tab, ic) {
+  const L = colLetter(ic); return await readRange(`${tab}!${L}1:${L}${MAXROW[tab]}`);
+}
+async function locate(tab, id) {
+  if (!(id > 0)) throw new Error('That row is still saving. Give it a moment and try again.');
+  const { header, ic } = await readHeader(tab);
+  const col = await readIds(tab, ic), hits = [];
+  for (let i = 1; i < col.length; i++) if (S((col[i] || [])[0]) === String(id)) hits.push(i + 1);
+  if (hits.length > 1) throw new Error(`Two rows in the ${tab} tab share id ${id}, so I haven't changed anything. Fix the duplicate in the sheet.`);
+  if (!hits.length) throw new Error(`I couldn't find id ${id} in the ${tab} tab, so I haven't changed anything. Press Refresh.`);
+  return { row: hits[0], header };
+}
+async function writeCells(tab, rec, ch) {
+  const { row, header } = await locate(tab, rec.id);
+  const keys = Object.keys(ch);
+  for (const k of keys) if (header.indexOf(k) < 0) throw new Error(`The ${tab} tab has no "${k}" column, so I haven't changed anything.`);
+  for (const k of keys) await call('update_values', { range: `${tab}!${colLetter(header.indexOf(k))}${row}`, values: [[fmtVal(k, ch[k])]] });
+}
+async function clearRow(tab, rec) {
+  const { row, header } = await locate(tab, rec.id);
+  await call('update_values', { range: `${tab}!A${row}:${colLetter(header.length - 1)}${row}`, values: [header.map(() => '')] });
+}
+async function addRow(tab, rec) {
+  const { header, ic } = await readHeader(tab);
+  const col = await readIds(tab, ic);
+  let max = 0, last = 1;
+  for (let i = 1; i < col.length; i++) { const v = S((col[i] || [])[0]); if (v !== '') { last = i + 1; const n = Number(v); if (n > max) max = n; } }
+  const n = last + 1, id = max + 1;
+  if (n > MAXROW[tab]) throw new Error(`The ${tab} tab is full.`);
+  const values = header.map(k => k === 'id' ? id : (k in rec && k !== 'id') ? fmtVal(k, rec[k]) : '');
+  await call('update_values', { range: `${tab}!A${n}:${colLetter(header.length - 1)}${n}`, values: [values] });
+  return id;
+}
+
+/* ---------- write queue and optimistic updates ---------- */
+let queue = Promise.resolve(), tmpN = 0;
+function enqueue(fn) {
+  state.pending++; updateStatus();
+  const p = queue.then(fn); queue = p.then(() => {}, () => {});
+  return p.finally(() => { state.pending--; updateStatus(); });
+}
+function canWrite() {
+  if (state.mcp && state.live) return true;
+  notice('Changes need the live connection, and you\'re looking at the last loaded copy. Press ' + ($('refreshBtn').textContent) + ' first.', 'error');
+  return false;
+}
+function act({ apply, undo, write, done }) {
+  if (!canWrite()) return Promise.resolve(false);
+  apply(); renderAll(); saveCache();
+  return enqueue(write).then(r => { if (done) done(r); saveCache(); return true; }, err => {
+    undo(); renderAll(); saveCache(); notice(errText(err), 'error'); setStatus('error', 'Last change didn\'t save'); return false;
+  });
+}
+const TAB_OF = { lists: 'Lists', items: 'Items', dates: 'Dates' };
+function updateRecords(kind, ops) {
+  const olds = ops.map(o => { const old = {}; for (const k in o.ch) old[k] = o.rec[k]; return old; });
+  return act({
+    apply: () => ops.forEach(o => Object.assign(o.rec, o.ch)),
+    undo: () => ops.forEach((o, i) => Object.assign(o.rec, olds[i])),
+    write: async () => { for (const o of ops) await writeCells(TAB_OF[kind], o.rec, o.ch); }
+  });
+}
+function deleteRecord(kind, rec) {
+  const idx = state[kind].indexOf(rec);
+  return act({
+    apply: () => { state[kind] = state[kind].filter(x => x !== rec); },
+    undo: () => { state[kind].splice(Math.min(idx, state[kind].length), 0, rec); },
+    write: () => clearRow(TAB_OF[kind], rec)
+  });
+}
+function addRecord(kind, rec) {
+  rec.id = --tmpN;
+  return act({
+    apply: () => { state[kind].push(rec); },
+    undo: () => { state[kind] = state[kind].filter(x => x !== rec); },
+    write: () => { const copy = { ...rec }; delete copy.id; return addRow(TAB_OF[kind], copy); },
+    done: id => { const old = rec.id; rec.id = id; document.querySelectorAll(`[data-id="${old}"]`).forEach(e => { e.dataset.id = id; }); document.querySelectorAll(`[data-did="${old}"]`).forEach(e => { e.dataset.did = id; }); }
+  });
+}
+
+/* ---------- ordering ---------- */
+function orderBetween(po, no) { return po == null && no == null ? 1 : po == null ? no - 1 : no == null ? po + 1 : (po + no) / 2; }
+const endOrder = arr => arr.length ? Math.max(...arr.map(x => x.order)) + 1 : 1;
+function place(kind, rec, siblings, prev, next, extra) {
+  const po = prev ? prev.order : null, no = next ? next.order : null, ops = [];
+  if (po != null && no != null && Math.abs(no - po) < 0.0001) {
+    const arr = siblings.filter(x => x !== rec), at = prev ? arr.indexOf(prev) + 1 : 0; arr.splice(at, 0, rec);
+    arr.forEach((x, i) => { const ch = {}; if (x.order !== i + 1) ch.order = i + 1; if (x === rec) Object.assign(ch, extra); if (Object.keys(ch).length) ops.push({ rec: x, ch }); });
+  } else {
+    const order = orderBetween(po, no), ch = { ...extra }; if (order !== rec.order) ch.order = order;
+    if (Object.keys(ch).length) ops.push({ rec, ch });
+  }
+  if (ops.length) return updateRecords(kind, ops);
+  return Promise.resolve(false);
+}
+const placeItem = (it, lid, prev, next) => place('items', it, itemsOf(lid), prev, next, it.listId === lid ? {} : { listId: lid });
+const placeList = (l, prev, next) => place('lists', l, listsOf(l.tab), prev, next, {});
+function moveList(l, dir) {
+  const vis = listsOf(l.tab), i = vis.indexOf(l);
+  if (dir < 0) { if (i <= 0) return toast('That list is already at the top.'); placeList(l, vis[i - 2] || null, vis[i - 1]); }
+  else { if (i >= vis.length - 1) return toast('That list is already at the bottom.'); placeList(l, vis[i + 1], vis[i + 2] || null); }
+}
+function onListDrop(evt) {
+  if (evt.oldIndex === evt.newIndex) return;
+  const kids = [...evt.to.children].filter(e => e.classList.contains('card')), i = kids.indexOf(evt.item);
+  const lk = el => el ? listById(+el.dataset.lid) : null, l = lk(evt.item);
+  setTimeout(() => placeList(l, lk(kids[i - 1]), lk(kids[i + 1])), 0);
+}
+function onItemDrop(evt) {
+  if (evt.from === evt.to && evt.oldIndex === evt.newIndex) return;
+  const kids = [...evt.to.children].filter(e => e.classList.contains('irow')), i = kids.indexOf(evt.item);
+  const ik = el => el ? itemById(+el.dataset.id) : null, it = ik(evt.item), lid = +evt.to.dataset.lid;
+  setTimeout(() => placeItem(it, lid, ik(kids[i - 1]), ik(kids[i + 1])), 0);
+}
+let sorts = [];
+const filtering = () => !!(state.q.trim() || state.pri);
+function initSort() {
+  sorts.forEach(s => s.destroy()); sorts = [];
+  if (!window.Sortable || state.view !== 'main' || state.tab === 'next' || filtering()) return;
+  const cards = document.querySelector('.cards');
+  if (cards) sorts.push(Sortable.create(cards, { handle: '.lgrip', draggable: '.card', animation: 150, ghostClass: 'ghost', onEnd: onListDrop }));
+  document.querySelectorAll('.items').forEach(ul => sorts.push(Sortable.create(ul, { group: 'items-' + state.tab, handle: '.igrip', draggable: '.irow', animation: 150, ghostClass: 'ghost', onEnd: onItemDrop })));
+}
+
+/* ---------- item actions ---------- */
+const NEXT_STATUS = { 'Not started': 'Done', 'Done': 'Stalled', 'Stalled': 'Not started' };
+function setItemStatus(it, s) {
+  updateRecords('items', [{ rec: it, ch: { status: s, doneOn: s === 'Done' ? todayIso() : '' } }]).then(ok => {
+    if (ok && s === 'Stalled') toast('Stalled. Add a reason?', 'Add reason', () => openItem(it, 'notes'));
+  });
+}
+const cycle = it => setItemStatus(it, NEXT_STATUS[it.status]);
+function addItem(lid, title) {
+  title = title.trim(); if (!title) return;
+  addRecord('items', { listId: lid, order: endOrder(itemsOf(lid)), title, status: 'Not started', priority: '', due: '', notes: '', link: '', cost: null, added: todayIso(), doneOn: '' });
+  const inp = document.querySelector(`.addrow[data-lid="${lid}"] input`); if (inp) inp.focus();
+}
+
+/* ---------- rendering ---------- */
+const BOX = {
+  'Not started': '<span class="bx"></span>',
+  'Stalled': '<span class="bx st"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7h8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>',
+  'Done': '<span class="bx dn"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.4l2.6 2.6L11 4.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'
+};
+function itemRow(it, o = {}) {
+  const t = todayIso(), overdue = it.due && it.status !== 'Done' && it.due < t, url = safeUrl(it.link);
+  const chips = (o.listChip ? `<span class="chip lc">${esc(o.listChip)}</span>` : '')
+    + (it.priority ? `<span class="pill p-${it.priority}">${it.priority}</span>` : '')
+    + (it.due ? `<span class="chip due${overdue ? ' od' : ''}">${overdue ? 'Overdue · ' : ''}${fmtDate(it.due)}</span>` : '')
+    + (it.notes.trim() ? '<span class="chip note" title="Has notes" aria-label="Has notes">📝</span>' : '');
+  const notes = o.notes && it.notes.trim() ? `<span class="snote">${esc(it.notes)}</span>` : '';
+  const label = `${it.title}: ${it.status}. Tap to change.`;
+  return `<li class="irow${it.status === 'Done' ? ' done' : ''}${o.ro ? ' ro' : ''}" data-id="${it.id}">`
+    + (o.noGrip ? '' : '<span class="igrip" aria-hidden="true">⠿</span>')
+    + (o.ro ? `<span class="sbox" aria-label="${esc(it.status)}" role="img">${BOX[it.status]}</span>`
+      : `<button type="button" class="sbox" data-act="cycle" aria-label="${esc(label)}">${BOX[it.status]}</button>`)
+    + (o.ro ? `<span class="ibody"><span class="it">${esc(it.title)}</span><span class="chips">${chips}</span>${notes}</span>`
+      : `<button type="button" class="ibody" data-act="open"><span class="it">${esc(it.title)}</span><span class="chips">${chips}</span>${notes}</button>`)
+    + (url ? `<a class="lnk" href="${esc(url)}" target="_blank" rel="noopener" aria-label="Open link for ${esc(it.title)}">↗</a>` : '')
+    + '</li>';
+}
+function renderDates() {
+  const t = todayIso();
+  const up = state.dates.filter(d => d.date && d.date >= t).sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id).slice(0, 8);
+  $('dates').innerHTML = up.map(d => {
+    const n = dayDiff(t, d.date), cd = n === 0 ? 'today' : n === 1 ? '1 day' : n + ' days';
+    return `<button type="button" class="dchip" data-did="${d.id}"><b>${esc(d.label || 'Date')}</b> · ${fmtDate(d.date)} · <span class="cd">${cd}</span></button>`;
+  }).join('') + '<button type="button" class="dchip add" data-act="adddate">+ Date</button>';
+}
+function renderSeg() {
+  document.querySelectorAll('#seg button').forEach(b => b.setAttribute('aria-selected', String(state.view === 'main' && b.dataset.tab === state.tab)));
+}
+function nextSections() {
+  const t = todayIso(), t14 = addDays(t, 14);
+  const open = state.items.filter(i => { const l = listById(i.listId); return i.status !== 'Done' && l && !l.archived; });
+  const dueSort = (a, b) => a.due.localeCompare(b.due) || a.id - b.id;
+  const overdue = open.filter(i => i.due && i.due < t).sort(dueSort);
+  const soon = open.filter(i => i.due && i.due >= t && i.due <= t14).sort(dueSort);
+  const stalled = open.filter(i => i.status === 'Stalled' && !(i.due && i.due <= t14)).sort(byOrder);
+  const high = open.filter(i => i.priority === 'High' && !i.due && i.status !== 'Stalled').sort(byOrder);
+  return [['overdue', 'Overdue', overdue], ['soon', 'Next 14 days', soon], ['high', 'High priority, no date', high], ['stalled', 'Stalled', stalled]];
+}
+function renderNext() {
+  const secs = nextSections().filter(s => s[2].length);
+  if (!secs.length) return `<div class="empty">${state.loaded ? 'All clear. Nothing overdue, nothing due soon and nothing stalled. Nice work, have a cuppa.' : 'Loading your lists…'}</div>`;
+  return secs.map(([key, name, arr]) => `<section class="nsec" data-sec="${key}"><h3>${name} · ${arr.length}</h3><ul class="nlist">`
+    + arr.map(i => itemRow(i, { listChip: (listById(i.listId) || {}).name, notes: i.status === 'Stalled', noGrip: true })).join('') + '</ul></section>').join('');
+}
+const matches = it => (!state.pri || it.priority === state.pri) && (!state.q.trim() || (it.title + '\n' + it.notes).toLowerCase().includes(state.q.trim().toLowerCase()));
+function renderTab() {
+  const tab = state.tab, f = filtering(); let html = '';
+  const lists = listsOf(tab);
+  let shown = 0;
+  for (const l of lists) {
+    const all = itemsOf(l.id), done = all.filter(i => i.status === 'Done').length;
+    let vis = all.filter(matches); if (state.hideDone) vis = vis.filter(i => i.status !== 'Done');
+    if (f && !vis.length) continue;
+    shown++;
+    const cost = all.reduce((s, i) => s + (i.cost || 0), 0), hasCost = all.some(i => i.cost != null && i.cost !== 0);
+    const col = !!state.collapsed[l.id];
+    html += `<section class="card${f ? ' nodrag' : ''}" data-lid="${l.id}"><div class="chead"><span class="lgrip" aria-hidden="true">⠿</span>`
+      + `<button type="button" class="cname" data-act="collapse" aria-expanded="${!col}"><span class="chev"></span><span class="nm">${esc(l.name)}</span></button>`
+      + `<button type="button" class="lmenu" data-act="lmenu" aria-label="Menu for ${esc(l.name)}">⋯</button>`
+      + `<div class="cmeta"><span class="cnt">${done} / ${all.length}</span>${hasCost ? `<span class="cost">${money(cost)}</span>` : ''}</div></div>`
+      + `<div class="pbar"><i style="width:${all.length ? Math.round(done / all.length * 100) : 0}%"></i></div>`
+      + `<div class="cbody"${col ? ' hidden' : ''}><ul class="items${f ? ' nodrag' : ''}" data-lid="${l.id}">${vis.map(i => itemRow(i)).join('')}</ul>`
+      + `<form class="addrow" data-lid="${l.id}"><input aria-label="Add item to ${esc(l.name)}" placeholder="+ Add item" autocomplete="off" enterkeyhint="done"></form></div></section>`;
+  }
+  if (!shown) html = `<div class="empty">${f ? 'Nothing matches that search or filter.' : state.loaded ? `No lists in ${TAB_NAME[tab]} yet. Start one below.` : 'Loading your lists…'}</div>`;
+  else html = `<div class="cards">${html}</div>`;
+  return html + (f ? '' : `<button type="button" class="btn btn-add" data-act="newlist">+ New list</button>`);
+}
+function renderArchive() {
+  let html = '<div class="arch-head"><button type="button" class="btn" data-act="back">← Back</button><h2>Archive</h2></div>', n = 0;
+  for (const tab of ['Prep', 'Settle', 'Ballarat']) {
+    const ls = listsOf(tab, true); if (!ls.length) continue;
+    html += `<h3>${TAB_NAME[tab]}</h3>`;
+    for (const l of ls) {
+      n++; const all = itemsOf(l.id), done = all.filter(i => i.status === 'Done').length;
+      html += `<section class="card arch-card" data-lid="${l.id}"><div class="chead"><div class="cname" style="cursor:default"><span class="nm">${esc(l.name)}</span></div>`
+        + `<button type="button" class="btn" data-act="unarchive" aria-label="Unarchive ${esc(l.name)}">Unarchive</button><div class="cmeta"><span>${done} / ${all.length} done</span></div></div>`
+        + `<ul class="items">${all.map(i => itemRow(i, { ro: true, noGrip: true, notes: true })).join('')}</ul></section>`;
+    }
+  }
+  if (!n) html += '<div class="empty">Nothing archived yet.</div>';
+  return html;
+}
+function renderAll() {
+  renderDates(); renderSeg();
+  const tabView = state.view === 'main' && state.tab !== 'next';
+  $('bar').hidden = !tabView; $('hint').hidden = !(tabView && filtering());
+  $('main').innerHTML = state.view === 'archive' ? renderArchive() : state.tab === 'next' ? renderNext() : renderTab();
+  initSort();
+}
+
+/* ---------- popup menu ---------- */
+let menuItems = [], menuAnchor = null;
+function openMenu(btn, items) {
+  const m = $('menu'); menuItems = items; menuAnchor = btn;
+  m.innerHTML = items.map((it, i) => `<button type="button" role="menuitem" data-i="${i}"${it.danger ? ' class="danger"' : ''}>${esc(it.label)}</button>`).join('');
+  m.hidden = false; m.style.left = '0px'; m.style.top = '0px';
+  const r = btn.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
+  m.style.left = Math.max(8, Math.min(r.right - w, innerWidth - w - 8)) + 'px';
+  m.style.top = (r.bottom + 4 + h > innerHeight - 8 ? Math.max(8, r.top - h - 4) : r.bottom + 4) + 'px';
+  m.querySelector('button').focus();
+}
+function closeMenu(refocus) { $('menu').hidden = true; if (refocus && menuAnchor && menuAnchor.isConnected) menuAnchor.focus(); }
+$('menu').addEventListener('click', e => { const b = e.target.closest('button[data-i]'); if (!b) return; const it = menuItems[+b.dataset.i]; closeMenu(false); it.fn(); });
+document.addEventListener('click', e => { if (!$('menu').hidden && !e.target.closest('#menu') && !e.target.closest('[data-act="lmenu"]') && e.target.id !== 'menuBtn') closeMenu(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('menu').hidden) { e.preventDefault(); closeMenu(true); } });
+
+/* ---------- small dialogs: confirm, text, choice, key dates ---------- */
+function ask(title, bodyHtml, buttons) {
+  return new Promise(res => {
+    const d = $('mDlg'); let val = null;
+    $('mTitle').textContent = title; $('mBody').innerHTML = bodyHtml; $('mErr').textContent = '';
+    const foot = $('mFoot'); foot.innerHTML = '';
+    buttons.forEach(b => {
+      const el = document.createElement('button'); el.type = 'button';
+      el.className = 'btn' + (b.primary ? ' btn-primary' : '') + (b.danger ? ' danger' : ''); el.textContent = b.label;
+      if (b.primary) el.dataset.primary = '1';
+      if (b.spacer) { const sp = document.createElement('span'); sp.className = 'sp'; foot.appendChild(sp); }
+      el.onclick = () => {
+        if (b.check) { const m = b.check(); if (m) { $('mErr').textContent = m; return; } }
+        val = typeof b.value === 'function' ? b.value() : b.value; d.close();
+      };
+      foot.appendChild(el);
+    });
+    d.onclose = () => res(val);
+    d.showModal();
+    const first = $('mBody').querySelector('input,textarea,select'); (first || foot.querySelector('[data-primary]') || foot.lastChild).focus();
+  });
+}
+const askOk = (msg, ok = 'Delete') => ask('Are you sure?', `<p style="margin:0">${esc(msg)}</p>`, [{ label: 'Cancel', value: false }, { label: ok, primary: ok !== 'Delete', danger: ok === 'Delete', value: true }]);
+const askText = (title, label, value, ok) => ask(title, `<div class="field"><label for="mText">${esc(label)}</label><input id="mText" autocomplete="off" value="${esc(value)}"></div>`,
+  [{ label: 'Cancel', value: null }, { label: ok, primary: true, check: () => $('mText').value.trim() ? '' : 'Please type a name.', value: () => $('mText').value.trim() }]);
+$('mBody').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); $('mFoot').querySelector('[data-primary]').click(); } });
+async function askTab(current) {
+  const opts = ['Prep', 'Settle', 'Ballarat'].filter(t => t !== current);
+  return ask('Move to which tab?', '<p class="muted" style="margin:0">The list goes to the bottom of that tab.</p>', [{ label: 'Cancel', value: null }, ...opts.map(t => ({ label: TAB_NAME[t], primary: true, value: t }))]);
+}
+async function editDate(d) {
+  const isNew = !d, rec = d || { label: '', date: '', notes: '' };
+  const body = `<div class="dlg-body" style="padding:0"><div class="field"><label for="dLabel">Label</label><input id="dLabel" autocomplete="off" value="${esc(rec.label)}"></div>`
+    + `<div class="field"><label for="dDate">Date</label><input id="dDate" type="date" value="${esc(rec.date)}"></div>`
+    + `<div class="field"><label for="dNotes">Notes</label><textarea id="dNotes">${esc(rec.notes)}</textarea></div></div>`;
+  const r = await ask(isNew ? 'Add a key date' : 'Key date', body, [
+    ...(isNew ? [] : [{ label: 'Delete', danger: true, value: 'delete' }]),
+    { label: 'Cancel', value: null, spacer: true },
+    { label: 'Save', primary: true, check: () => !$('dLabel').value.trim() ? 'Give it a label.' : !$('dDate').value ? 'Pick a date.' : '', value: () => ({ label: $('dLabel').value.trim(), date: $('dDate').value, notes: $('dNotes').value }) }
+  ]);
+  if (!r) return;
+  if (r === 'delete') { if (await askOk(`Delete “${rec.label}”?`)) deleteRecord('dates', d); return; }
+  if (isNew) { addRecord('dates', r); return; }
+  const ch = {}; for (const k of ['label', 'date', 'notes']) if (r[k] !== d[k]) ch[k] = r[k];
+  if (Object.keys(ch).length) updateRecords('dates', [{ rec: d, ch }]);
+}
+
+/* ---------- item dialog ---------- */
+let cur = null;
+const seg = id => { const b = $(id).querySelector('[aria-pressed="true"]'); return b ? b.dataset.v : ''; };
+const setSeg = (id, v) => $(id).querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
+['iStatus', 'iPri'].forEach(id => $(id).addEventListener('click', e => { const b = e.target.closest('button'); if (b) setSeg(id, b.dataset.v); }));
+function openItem(it, focus) {
+  if (!it) return;
+  if (!(it.id > 0)) { toast('That item is still saving. Try again in a moment.'); return; }
+  cur = it;
+  $('iHead').textContent = 'Edit item';
+  $('iTitle').value = it.title; setSeg('iStatus', it.status); setSeg('iPri', it.priority);
+  $('iDue').value = it.due; $('iNotes').value = it.notes; $('iLink').value = it.link; $('iCost').value = it.cost == null ? '' : it.cost;
+  $('iList').innerHTML = ['Prep', 'Settle', 'Ballarat'].map(t => `<optgroup label="${TAB_NAME[t]}">${listsOf(t).map(l => `<option value="${l.id}">${esc(l.name)}</option>`).join('')}</optgroup>`).join('');
+  $('iList').value = String(it.listId); $('iMsg').textContent = '';
+  $('iDlg').showModal(); (focus === 'notes' ? $('iNotes') : $('iTitle')).focus();
+}
+$('iClose').addEventListener('click', () => $('iDlg').close());
+$('iCancel').addEventListener('click', () => $('iDlg').close());
+$('iDueClear').addEventListener('click', () => { $('iDue').value = ''; });
+$('iForm').addEventListener('submit', e => {
+  e.preventDefault(); const it = cur; if (!it) return;
+  const title = $('iTitle').value.trim(); if (!title) { $('iMsg').textContent = 'Please give it a title.'; $('iTitle').focus(); return; }
+  const rawCost = $('iCost').value.trim(), cost = rawCost === '' ? null : toNum(rawCost);
+  if (rawCost !== '' && cost == null) { $('iMsg').textContent = 'Cost should be a number, like 120 or 49.95.'; $('iCost').focus(); return; }
+  const nw = { title, status: seg('iStatus'), priority: seg('iPri'), due: $('iDue').value, notes: $('iNotes').value, link: $('iLink').value.trim(), cost, listId: +$('iList').value };
+  const ch = {}; for (const k in nw) if (nw[k] !== it[k]) ch[k] = nw[k];
+  if ('status' in ch) ch.doneOn = ch.status === 'Done' ? todayIso() : '';
+  if ('listId' in ch) ch.order = endOrder(itemsOf(ch.listId));
+  $('iDlg').close();
+  if (!Object.keys(ch).length) return;
+  updateRecords('items', [{ rec: it, ch }]).then(ok => { if (ok && ch.status === 'Stalled') toast('Stalled. Add a reason?', 'Add reason', () => openItem(it, 'notes')); });
+});
+$('iDel').addEventListener('click', async () => {
+  const it = cur; if (!it) return;
+  if (await askOk(`Delete “${it.title}”? This can't be undone.`)) { $('iDlg').close(); deleteRecord('items', it); }
+});
+
+/* ---------- lists ---------- */
+async function renameList(l) { const n = await askText('Rename list', 'List name', l.name, 'Save'); if (n && n !== l.name) updateRecords('lists', [{ rec: l, ch: { name: n } }]); }
+async function newList() {
+  const tab = state.tab, n = await askText('New list', 'List name', '', 'Add list'); if (!n) return;
+  addRecord('lists', { tab, name: n, order: endOrder(listsOf(tab)), archived: false, notes: '' });
+}
+async function moveListTab(l) {
+  const t = await askTab(l.tab); if (!t) return;
+  updateRecords('lists', [{ rec: l, ch: { tab: t, order: endOrder(listsOf(t)) } }]);
+}
+async function deleteList(l) {
+  if (itemsOf(l.id).length) { toast('That list still has items. Archive it instead.'); return; }
+  if (await askOk(`Delete the list “${l.name}”? This can't be undone.`)) deleteRecord('lists', l);
+}
+function listMenu(l, btn) {
+  const items = [{ label: 'Rename', fn: () => renameList(l) }, { label: 'Move up', fn: () => moveList(l, -1) }, { label: 'Move down', fn: () => moveList(l, 1) },
+    { label: 'Move to tab…', fn: () => moveListTab(l) }, { label: 'Archive', fn: () => updateRecords('lists', [{ rec: l, ch: { archived: true } }]) }];
+  if (!itemsOf(l.id).length) items.push({ label: 'Delete', danger: true, fn: () => deleteList(l) });
+  openMenu(btn, items);
+}
+
+/* ---------- events ---------- */
+$('main').addEventListener('click', e => {
+  const a = e.target.closest('[data-act]'), row = e.target.closest('.irow'), card = e.target.closest('[data-lid]');
+  const it = row && !row.classList.contains('ro') ? itemById(+row.dataset.id) : null;
+  if (!a) { if (it && !e.target.closest('button,a,input,.igrip')) openItem(it); return; }
+  switch (a.dataset.act) {
+    case 'cycle': if (it) cycle(it); break;
+    case 'open': if (it) openItem(it); break;
+    case 'collapse': { const id = card.dataset.lid; if (state.collapsed[id]) delete state.collapsed[id]; else state.collapsed[id] = 1; store.set('bm_collapsed', JSON.stringify(state.collapsed)); renderAll(); break; }
+    case 'lmenu': listMenu(listById(+card.dataset.lid), a); break;
+    case 'newlist': newList(); break;
+    case 'back': state.view = 'main'; renderAll(); break;
+    case 'unarchive': updateRecords('lists', [{ rec: listById(+card.dataset.lid), ch: { archived: false } }]); break;
+  }
+});
+$('main').addEventListener('submit', e => { e.preventDefault(); const f = e.target.closest('.addrow'); if (f) { addItem(+f.dataset.lid, f.querySelector('input').value); } });
+$('dates').addEventListener('click', e => {
+  const c = e.target.closest('[data-did]'); if (c) { editDate(state.dates.find(d => d.id === +c.dataset.did)); return; }
+  if (e.target.closest('[data-act="adddate"]')) { if (canWrite()) editDate(null); }
+});
+$('seg').addEventListener('click', e => {
+  const b = e.target.closest('button[data-tab]'); if (!b) return;
+  state.tab = b.dataset.tab; state.view = 'main'; store.set('bm_tab', state.tab); renderAll();
+});
+$('q').addEventListener('input', () => { state.q = $('q').value; $('hint').hidden = !filtering(); renderMainOnly(); });
+function renderMainOnly() { $('main').innerHTML = state.tab === 'next' ? renderNext() : renderTab(); initSort(); }
+$('pseg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return; state.pri = b.dataset.p;
+  $('pseg').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); $('hint').hidden = !filtering(); renderMainOnly();
+});
+$('hClose').addEventListener('click', () => $('hDlg').close());
+$('menuBtn').addEventListener('click', () => {
+  if (!$('menu').hidden) { closeMenu(true); return; }
+  openMenu($('menuBtn'), [
+    { label: state.hideDone ? 'Show done items' : 'Hide done items', fn: () => { state.hideDone = !state.hideDone; store.set('bm_hidedone', state.hideDone ? '1' : '0'); renderAll(); } },
+    { label: 'Archive', fn: () => { state.view = 'archive'; renderAll(); window.scrollTo({ top: 0 }); } },
+    { label: 'Change sheet link', fn: openSheetDlg },
+    { label: 'Help', fn: () => $('hDlg').showModal() }
+  ]);
+});
+$('refreshBtn').addEventListener('click', () => {
+  if (!SHEET_ID) { openSheetDlg(); return; }
+  if (state.google && !google_.valid()) googleConnect(); else refresh();
+});
+
+/* ---------- sheet link ---------- */
+function openSheetDlg() { $('sLink').value = ''; $('sMsg').textContent = ''; $('sDlg').showModal(); $('sLink').focus(); }
+$('sClose').addEventListener('click', () => $('sDlg').close());
+$('sForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const v = $('sLink').value.trim(), m = v.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/) || (/^[a-zA-Z0-9_-]{20,}$/.test(v) ? [0, v] : null);
+  if (!m) { $('sMsg').textContent = 'That doesn\'t look like a Google Sheet link. It should contain /spreadsheets/d/…'; return; }
+  const changed = m[1] !== SHEET_ID; SHEET_ID = m[1];
+  store.set('bm_config', JSON.stringify({ ...store.json('bm_config', {}), sheetId: SHEET_ID }));
+  $('sDlg').close(); notice('');
+  if (changed) { state.lists = []; state.items = []; state.dates = []; state.loaded = false; state.live = false; renderAll(); }
+  if (state.google && !google_.valid()) googleConnect(); else if (state.mcp) refresh();
+});
+
+/* ---------- load ---------- */
+async function refresh() {
+  if (!SHEET_ID) { openSheetDlg(); return; }
+  if (!state.mcp) return;
+  setStatus('loading', 'Loading…'); $('refreshBtn').disabled = true;
+  try {
+    const [l, i, d] = await Promise.all([readRange('Lists!A1:Z1000'), readRange('Items!A1:Z5000'), readRange('Dates!A1:Z300')]);
+    const lists = rowsToObjs(l, 'Lists').map(toList).filter(x => x.id > 0);
+    const items = rowsToObjs(i, 'Items').map(toItem).filter(x => x.id > 0);
+    const dates = rowsToObjs(d, 'Dates').map(toDateRec).filter(x => x.id > 0);
+    state.lists = lists; state.items = items; state.dates = dates; state.loaded = true; state.live = true;
+    saveCache(); notice(''); updateStatus();
+    if (state.pending === 0) setStatus('live', 'Live');
+  } catch (err) {
+    state.live = false;
+    if (!(err && err.code === 'google_signin')) {
+      setStatus('error', hasData() ? 'Offline · showing last loaded' : 'Couldn\'t load');
+      notice(errText(err), 'error');
+    }
+  } finally { $('refreshBtn').disabled = false; renderAll(); }
+}
+
+loadCache(); renderAll();
+if (!SHEET_ID) { setStatus('error', 'No sheet linked yet'); $('refreshBtn').textContent = 'Connect'; openSheetDlg(); }
+else if (hasData()) setStatus('loading', 'Connecting…');
+(async () => {
+  if (!(window.claude && window.claude.use)) { googleBoot(); return; }
+  let mcp = null;
+  try { mcp = await window.claude.use('mcp'); } catch (e) {}
+  if (!mcp) {
+    setStatus('error', hasData() ? 'Offline · showing last loaded' : 'Not connected');
+    notice('This view can\'t reach Google Sheets. Open the page in Claude to see live data and make changes.');
+    return;
+  }
+  state.mcp = mcp;
+  if (SHEET_ID) refresh();
+})();
+</script>
